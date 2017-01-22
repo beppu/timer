@@ -1,5 +1,6 @@
 (ns timer.ui
-  (:use [seesaw core border table mig]))
+  (:require [timer.timer :as t])
+  (:use [seesaw core border make-widget mig]))
 
 (defn timer-widget
   "Return an interactive widget for controlling a timer."
@@ -8,9 +9,8 @@
 
 (defn timer-list
   [timers]
-  (scrollable
-   (vertical-panel
-    :items (map #(timer-widget %) timers))))
+  (vertical-panel
+   :items (map timer-widget timers)))
 
 (defn app-layout
   [app]
