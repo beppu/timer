@@ -8,7 +8,8 @@
 
 ;; A record for holding timer metadata
 (defrecord Timer
-    [name                               ; String
+    [id                                 ; UUID
+     name                               ; String
      status                             ; :stopped :running :paused
      duration                           ; Integer milliseconds
      elapsed                            ; Integer milliseconds
@@ -23,7 +24,8 @@
   "Returns a new timer wrapped in an atom."
   [opts]
   (let [t (map->Timer (merge
-                       {:status        :stopped
+                       {:id            (java.util.UUID/randomUUID)
+                        :status        :stopped
                         :duration      0
                         :elapsed       0
                         :previous      0

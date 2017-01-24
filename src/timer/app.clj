@@ -1,6 +1,6 @@
 (ns timer.app
-  (:require [timer.ui :as ui]
-            [timer.timer :as timer])
+  (:require [timer.timer :as timer])
+  (:import [timer.timer Timer])
   (:use [seesaw core make-widget mig]))
 
 ;; a record for containing app state
@@ -10,11 +10,19 @@
      vp                                 ; vertical-panel of timer widgets
      ])
 
+(extend-type Timer
+  MakeWidget
+  (make-widget* [timer]
+    (label (or (:name timer) "Timer"))))
+
 (defn add-timer
   "Add a timer to app."
   [app timer]
   ;; TODO - add timer to :timers list
   ;; TODO - add timer-widget to :vp
+  (swap! app (fn [a] (update-in a [:timers] conj timer)))
+  (add! (:vp @app) @timer)
+  (println @app)
   app)
 
 (defn remove-timer
@@ -48,7 +56,6 @@
              :action (action :name "Add Timer"
                              :handler (fn [e]
                                         (do
-                                          (println e)
                                           (add-timer app (timer/init {}))
                                           ))))
      :center (scrollable vp))))
