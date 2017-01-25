@@ -14,14 +14,27 @@
   "Create an interactive widget that can control a timer."
   [app timer]
   (mig-panel
-   :id (:id timer)
-   :items [[(label (or (:name timer) "Timer"))]
-           [(button :action
-                    (action :name "X"
-                            :handler (fn [e] (remove-timer app timer))))]
+   :id
+   (:id timer)
 
-           ]))
+   :constraints
+   []
 
+   :items
+   [[(label (or (:name timer) "Timer"))]
+    [(button :action
+             (action :name "X"
+                     :handler (fn [e] (remove-timer app timer)))) "wrap"]
+    [(spinner :model (spinner-model 0 :from 0 :to 99 :by 1))]
+    [(spinner :model (spinner-model 14 :from 0 :to 59 :by 1))]
+    [(spinner :model (spinner-model 33 :from 0 :to 59 :by 1)) "wrap"]
+    [(button :action
+             (action :name "Play"
+                     :handler (fn [e] (play-timer app timer))))]
+    [(button :action
+             (action :name "Pause"
+                     :handler (fn [e] (pause-timer app timer))))]
+    ]))
 
 (defn add-timer
   "Add a timer to app."
@@ -38,8 +51,6 @@
   [app timer]
   (swap! app (fn [a] (update-in a [:timers] (fn [timers]
                                              (filterv #(not (= (:id @timer) (:id (deref %)))) timers)))))
-  ;;(println :id (:id @timer))
-  ;;(println :timer ((-> @app :widgets-by-id) (-> @timer :id)))
   (remove! (:vp @app) ((:widgets-by-id @app) (:id @timer)))
   (swap! app (fn [a] (update-in a [:widgets-by-id] dissoc (:id @timer))))
   (println (mapv #(:id (deref %)) (:timers @app)))
