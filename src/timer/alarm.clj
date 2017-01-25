@@ -1,8 +1,6 @@
 (ns timer.alarm
   (:require [clj-audio.core :as audio]
-            [clojure.core.async
-             :as
-             a
+            [clojure.core.async :as a
              :refer
              [<!
               <!!
@@ -71,5 +69,5 @@
                      {:name    "Default"
                       :status  :stopped
                       :control (chan)
-                      :cb      default-start
+                      :cb      (wav-start-fn (clojure.java.io/resource "tada.wav"))
                       } opts))))

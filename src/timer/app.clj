@@ -10,24 +10,39 @@
      vp                                 ; vertical-panel of timer widgets
      ])
 
-(extend-type Timer
-  MakeWidget
-  (make-widget* [timer]
-    (label (or (:name timer) "Timer"))))
+(defn timer-widget
+  "Create an interactive widget that can control a timer."
+  [app timer]
+  (mig-panel
+   :id (:id timer)
+   :items [[(label (or (:name timer) "Timer"))]
+           [(button :action
+                    (action :name "X"
+                            :handler (fn [e] (remove-timer app timer))))]
+
+           ]))
+
 
 (defn add-timer
   "Add a timer to app."
   [app timer]
-  ;; TODO - add timer to :timers list
-  ;; TODO - add timer-widget to :vp
-  (swap! app (fn [a] (update-in a [:timers] conj timer)))
-  (add! (:vp @app) @timer)
-  (println @app)
+  (let [tw (timer-widget app timer)]
+    (swap! app (fn [a] (update-in a [:timers] conj timer)))
+    (add! (:vp @app) tw)
+    (swap! app (fn [a] (update-in a [:widgets-by-id] assoc (:id @timer) tw)))
+    (println (mapv #(:id (deref %)) (:timers @app))))
   app)
 
 (defn remove-timer
   "Remove a timer from app."
   [app timer]
+  (swap! app (fn [a] (update-in a [:timers] (fn [timers]
+                                             (filterv #(not (= (:id @timer) (:id (deref %)))) timers)))))
+  ;;(println :id (:id @timer))
+  ;;(println :timer ((-> @app :widgets-by-id) (-> @timer :id)))
+  (remove! (:vp @app) ((:widgets-by-id @app) (:id @timer)))
+  (swap! app (fn [a] (update-in a [:widgets-by-id] dissoc (:id @timer))))
+  (println (mapv #(:id (deref %)) (:timers @app)))
   app)
 
 (defn play-timer
