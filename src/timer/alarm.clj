@@ -14,7 +14,8 @@
               go
               go-loop
               thread
-              timeout]]))
+              timeout]]
+            [taoensso.timbre :as timbre :refer [debug]]))
 
 (defrecord Alarm
     [name                               ; String
@@ -29,9 +30,9 @@
   (go-loop []
     (let [[c channel] (alts! [(:control @aa) (timeout 1000)])]
       (if c
-        (println "Stop Alarm" c)
+        (debug "Stop Alarm" c)
         (do
-          (println "Alarm [" (:name @aa) "]")
+          (debug "Alarm [" (:name @aa) "]")
           (recur))))))
 
 (defn play-with-future
@@ -54,9 +55,8 @@
     (go-loop [f nil]
       (let [[c channel] (alts! [(:control @aa) (timeout 1000)])]
         (if c
-          (println "Stop Alarm" c)
+          (debug "Stop Alarm" c)
           (do
-            (println "Playing....")
             (recur (play-with-future wav f))))))))
 
 (defn start!

@@ -1,5 +1,6 @@
 (ns timer.app
-  (:require [timer.timer :as t])
+  (:require [timer.timer :as t]
+            [taoensso.timbre :as timbre :refer [debug]])
   (:import [timer.timer Timer])
   (:use [seesaw core make-widget mig]))
 
@@ -42,7 +43,7 @@
     (add! (:vp @app) tw)
     (swap! app (fn [a] (update-in a [:widgets-by-id] assoc (:id @timer) tw)))
     (add-watch timer :refresh (fn [k r o n] (refresh-timer! tw n)))
-    (println (mapv #(:id (deref %)) (:timers @app))))
+    (debug (mapv #(:id (deref %)) (:timers @app))))
   app)
 
 (defn remove-timer!
@@ -53,7 +54,7 @@
   (remove! (:vp @app) ((:widgets-by-id @app) (:id @timer)))
   (swap! app (fn [a] (update-in a [:widgets-by-id] dissoc (:id @timer))))
   (t/stop! timer)
-  (println (mapv #(:id (deref %)) (:timers @app)))
+  (debug (mapv #(:id (deref %)) (:timers @app)))
   app)
 
 (defn play-timer!
@@ -94,7 +95,7 @@
      []
 
      :items
-     [[(label (or (:name timer) "Timer"))]
+     [[(label (or (:name timer) "Timer")) "span 3"]
       [(button :action
                (action :name "X"
                        :handler (fn [e] (remove-timer! app timer)))) "wrap"]
@@ -107,7 +108,7 @@
                 [:change
                  (fn [e]
                    (let [new-duration (duration-from-timer app timer)]
-                     (println new-duration)
+                     (debug new-duration)
                      (t/duration! timer (duration-from-timer app timer))
                      ))]
                 )]
@@ -117,7 +118,7 @@
                 [:change
                  (fn [e]
                    (let [new-duration (duration-from-timer app timer)]
-                     (println new-duration)
+                     (debug new-duration)
                      (t/duration! timer (duration-from-timer app timer))
                      ))]
                 )]
@@ -127,7 +128,7 @@
                 [:change
                  (fn [e]
                    (let [new-duration (duration-from-timer app timer)]
-                     (println new-duration)
+                     (debug new-duration)
                      (t/duration! timer (duration-from-timer app timer))
                      ))]
                 ) "wrap"]
@@ -172,6 +173,7 @@
   "Return an atom with the initial application state."
   [opts]
   (let [timers  (or (:timers opts) [])
+        close   (or (:on-close opts) :exit)
         vp      (vertical-panel :items timers)
         icon    (clojure.java.io/resource "clock.png")
         app     (atom (map->App (merge
@@ -179,11 +181,13 @@
                                   :vp     vp
                                   :title "Timers"})))]
     (do
+      (debug opts close)
       (swap! app
              #(assoc % :frame
                      (frame :title (:title @app)
                             :icon icon
                             :size [640 :by 480]
+                            :on-close close
                             :content (app-layout app))))
       app)))
 

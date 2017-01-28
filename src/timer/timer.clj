@@ -1,10 +1,14 @@
 (ns timer.timer
-  (:require [clj-time.core :as t]
-            [clj-time.coerce :as c]
-            [clojure.core.async :as a
-             :refer [>! <! >!! <!! go go-loop chan close! thread alts! alts!! timeout]]
-            [timer.alarm]
-            ))
+  (:require [clj-time
+             [coerce :as c]
+             [core :as t]]
+            [clojure.core.async
+             :as
+             a
+             :refer
+             [<! <!! >! >!! alts! alts!! chan close! go go-loop thread timeout]]
+            [taoensso.timbre :as timbre :refer [debug]]
+            timer.alarm))
 
 ;; A record for holding timer metadata
 (defrecord Timer
@@ -68,8 +72,8 @@
       (let [[c channel] (alts! [(:control @at) (timeout 100)])]
         (if c
           (case c
-            :pause (do (println "Pause Timer" c))
-            :stop (do (println "Stop Timer" c)
+            :pause (do (debug "Pause Timer" c))
+            :stop (do (debug "Stop Timer" c)
                       (timer.alarm/stop! (:alarm @at))))
           (do
             (elapse! at)
