@@ -34,17 +34,30 @@
           (println "Alarm [" (:name @aa) "]")
           (recur))))))
 
+(defn play-with-future
+  "Play audio only if another audio is not already playing."
+  ([file]
+   (future (audio/play (audio/->stream file))))
+
+  ([file ft]
+   (if (future? ft)
+     (if (future-done? ft)
+       (play-with-future file)
+       ft)
+     (play-with-future file))
+   ))
+
 (defn wav-start-fn
   "Return an alarm start function that repeatedly plays a .wav file"
   [wav]
   (fn [aa]
-    (go-loop []
+    (go-loop [f nil]
       (let [[c channel] (alts! [(:control @aa) (timeout 1000)])]
         (if c
           (println "Stop Alarm" c)
           (do
-            (audio/play (audio/->stream wav))
-            (recur)))))))
+            (println "Playing....")
+            (recur (play-with-future wav f))))))))
 
 (defn start!
   "Start alarm."
