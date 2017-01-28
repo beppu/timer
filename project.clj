@@ -11,7 +11,8 @@
                  [xdg-basedir "1.0.0"]
                  [com.taoensso/timbre "4.8.0"]
                  [org.clojars.beppu/clj-audio "0.3.0"]
-                 [org.clojure/tools.cli "0.3.5"]]
+                 [org.clojure/tools.cli "0.3.5"]
+                 [intransit "0.2.1"]]
   :main ^:skip-aot timer.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

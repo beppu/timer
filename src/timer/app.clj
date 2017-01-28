@@ -8,7 +8,10 @@
     [timers                             ; Vector of Timer records
      frame                              ; main frame
      vp                                 ; vertical-panel of timer widgets
+     widgets-by-id                      ; map of widgets by id
      ])
+
+(declare timer-widget)
 
 (defn h:m:s
   "Turn a duration into a vector of hours, minutes, and seconds."
@@ -23,20 +26,15 @@
         s      (quot mm second)]
     (mapv #(.intValue %) [h m s])))
 
-(defn or-zero
-  "Return number if postive or zero otherwise."
-  [n]
-  (if (> n 0) n 0))
-
 (defn refresh-timer!
   "Refresh the elapsed time of a timer"
   [tw state]
-  (let [[h m s] (h:m:s (or-zero (- (:duration state) (:elapsed state))))]
-    (selection! (-> (select tw [:JSpinner]) (nth 0)) h)
-    (selection! (-> (select tw [:JSpinner]) (nth 1)) m)
-    (selection! (-> (select tw [:JSpinner]) (nth 2)) s)))
+  (let [[h m s] (h:m:s (max 0 (- (:duration state) (:elapsed state))))]
+    (config! (select tw [:#hr]) :text h)
+    (config! (select tw [:#mr]) :text m)
+    (config! (select tw [:#sr]) :text s)))
 
-(defn add-timer
+(defn add-timer!
   "Add a timer to app."
   [app timer]
   (let [tw (timer-widget app timer)]
@@ -47,7 +45,7 @@
     (println (mapv #(:id (deref %)) (:timers @app))))
   app)
 
-(defn remove-timer
+(defn remove-timer!
   "Remove a timer from app."
   [app timer]
   (swap! app (fn [a] (update-in a [:timers] (fn [timers]
@@ -76,6 +74,14 @@
   (t/stop! timer)
   app)
 
+(defn duration-from-timer
+  "Given an app and a timer, read the associated timer-widget's spinner widgets and calculate the duration."
+  [app timer]
+  (let [tw       ((-> @app :widgets-by-id) (:id @timer))
+        [h m s]  (->> (select tw [:JSpinner]) (map selection))
+        duration (+ (* 1000 s) (* 1000 60 m) (* 1000 60 60 h))]
+    duration))
+
 (defn timer-widget
   "Create an interactive widget that can control a timer."
   [app timer]
@@ -91,13 +97,40 @@
      [[(label (or (:name timer) "Timer"))]
       [(button :action
                (action :name "X"
-                       :handler (fn [e] (remove-timer app timer)))) "wrap"]
+                       :handler (fn [e] (remove-timer! app timer)))) "wrap"]
+      [(label :id :hr :v-text-position :bottom :h-text-position :right :text "0")]
+      [(label :id :mr :v-text-position :bottom :h-text-position :right :text "0")]
+      [(label :id :sr :v-text-position :bottom :h-text-position :right :text "0") "wrap"]
       [(spinner :id :h
-                :model (spinner-model h :from 0 :to 99 :by 1))]
+                :model (spinner-model h :from 0 :to 99 :by 1)
+                :listen
+                [:change
+                 (fn [e]
+                   (let [new-duration (duration-from-timer app timer)]
+                     (println new-duration)
+                     (t/duration! timer (duration-from-timer app timer))
+                     ))]
+                )]
       [(spinner :id :m
-                :model (spinner-model m :from 0 :to 59 :by 1))]
+                :model (spinner-model m :from 0 :to 59 :by 1)
+                :listen
+                [:change
+                 (fn [e]
+                   (let [new-duration (duration-from-timer app timer)]
+                     (println new-duration)
+                     (t/duration! timer (duration-from-timer app timer))
+                     ))]
+                )]
       [(spinner :id :s
-                :model (spinner-model s :from 0 :to 59 :by 1)) "wrap"]
+                :model (spinner-model s :from 0 :to 59 :by 1)
+                :listen
+                [:change
+                 (fn [e]
+                   (let [new-duration (duration-from-timer app timer)]
+                     (println new-duration)
+                     (t/duration! timer (duration-from-timer app timer))
+                     ))]
+                ) "wrap"]
       [(button :action
                (action :name "Play"
                        :handler (fn [e] (play-timer! app timer))))]
@@ -106,7 +139,7 @@
                        :handler (fn [e] (stop-timer! app timer))))]
       [(button :action
                (action :name "Pause"
-                       :handler (fn [e] (pause-timer! app timer))))]
+                       :handler (fn [e] (pause-timer! app timer)))) "wrap"]
       ])))
 
 (defn app-layout
@@ -120,7 +153,7 @@
              :action (action :name "Add Timer"
                              :handler (fn [e]
                                         (do
-                                          (add-timer app (timer/init {}))
+                                          (add-timer! app (t/init {}))
                                           ))))
      :center (scrollable vp))))
 
@@ -129,6 +162,11 @@
   [app n]
   ((-> @app :timers) n))
 
+(defn tw
+  "Return timer-widget n."
+  [app n]
+  (let [t (t app n)]
+    ((-> @app :widgets-by-id) (:id @t))))
 
 (defn init
   "Return an atom with the initial application state."

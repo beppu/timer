@@ -70,4 +70,5 @@
                       :status  :stopped
                       :control (chan)
                       :cb      (wav-start-fn (clojure.java.io/resource "tada.wav"))
+                      ;:cb      default-start
                       } opts))))
