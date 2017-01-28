@@ -30,7 +30,7 @@
   (let [t (map->Timer (merge
                        {:id            (java.util.UUID/randomUUID)
                         :status        :stopped
-                        :duration      5000
+                        :duration      0
                         :elapsed       0
                         :previous      0
                         :control       (chan)
