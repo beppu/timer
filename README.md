@@ -7,7 +7,7 @@ An Application For Managing Multiple Timers
 ### via git
 
 ```sh
-git clone git://github.com/beppu/timer.git
+git clone git@github.com:beppu/timer.git
 cd timer
 lein run
 ```
