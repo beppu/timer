@@ -181,7 +181,6 @@
                                   :vp     vp
                                   :title "Timers"})))]
     (do
-      (debug opts close)
       (swap! app
              #(assoc % :frame
                      (frame :title (:title @app)

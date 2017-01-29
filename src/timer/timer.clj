@@ -3,10 +3,8 @@
              [coerce :as c]
              [core :as t]]
             [clojure.core.async
-             :as
-             a
-             :refer
-             [<! <!! >! >!! alts! alts!! chan close! go go-loop thread timeout]]
+             :as a
+             :refer [<! <!! >! >!! alts! alts!! chan close! go go-loop thread timeout]]
             [taoensso.timbre :as timbre :refer [debug]]
             timer.alarm))
 
