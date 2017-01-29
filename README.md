@@ -1,36 +1,24 @@
 # timer
 
-This is fast.  Really nice.
+An Application For Managing Multiple Timers
 
 ## Installation
 
-Download from http://example.com/FIXME.
+### via git
 
-## Usage
+```sh
+git clone git://github.com/beppu/timer.git
+cd timer
+lein run
+```
 
-FIXME: explanation
+### Uberjar
 
-    $ java -jar timer-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+TODO
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2017
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
