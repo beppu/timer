@@ -2,6 +2,8 @@
 
 An Application For Managing Multiple Timers
 
+ihttp://beppu.github.io/post/writing-a-timer-in-clojure/
+
 ## Installation
 
 ### via git
