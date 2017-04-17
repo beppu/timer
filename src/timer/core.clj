@@ -13,7 +13,8 @@
                    :default :exit
                    :parse-fn (fn [s] (keyword s))
                    :validate [(fn [s] (#{:exit :hide :dispose :nothing} s)) "Valid values are exit, hide, dispose or nothing."]]
-                  ["-h" "--help" "Display help message"]])
+                  ["-h" "--help" "Display help message"]
+                  ["-v" "--verbose" "Be verbose"]])
 
 ;; credit: https://github.com/clojure/tools.cli/blob/master/README.md
 (defn usage
@@ -38,6 +39,8 @@
   (println msg)
   (System/exit status))
 
+;; To start the UI in the REPL for debugging:
+;; (-main "--on-close" "hide")
 (defn -main
   "Initialize the application state and show the UI."
   [& args]
