@@ -133,7 +133,7 @@
                      ))]
                 ) "wrap"]
       [(button :action
-               (action :name "Play"
+               (action :name "Start"
                        :handler (fn [e] (play-timer! app timer))))]
       [(button :action
                (action :name "Stop"
