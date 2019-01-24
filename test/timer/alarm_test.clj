@@ -4,5 +4,5 @@
 
 (deftest create-record
   (testing "An alarm should be created"
-    (let [a (alarm/atom-alarm {})]
+    (let [a (alarm/init {})]
       (is (= (:status @a) :stopped)))))

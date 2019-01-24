@@ -3,5 +3,5 @@
             [timer.core :refer :all]))
 
 (deftest a-test
-  (testing "FIXME, I fail."
+  (testing "FIXME, I don't do anything."
     (is (= 1 1))))
